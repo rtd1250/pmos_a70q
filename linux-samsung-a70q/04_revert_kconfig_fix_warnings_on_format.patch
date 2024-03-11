@@ -1,0 +1,13 @@
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index e2fc50ae4b90..cdcbe43e87b3 100755
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -11,8 +11,6 @@
+ #ifndef KBUILD_NO_NLS
+ # include <libintl.h>
+ #else
+-# include <features.h>
+-__attribute_format_arg__(1)
+ static inline const char *gettext(const char *txt) { return txt; }
+ static inline void textdomain(const char *domainname) {}
+ static inline void bindtextdomain(const char *name, const char *dir) {}

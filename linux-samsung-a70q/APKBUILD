@@ -1,0 +1,70 @@
+# Reference: <https://postmarketos.org/vendorkernel>
+# Kernel config based on: arch/arm64/configs/a70q_defconfig
+
+pkgname=linux-samsung-a70q
+pkgver=4.14.190
+pkgrel=0
+pkgdesc="Samsung Galaxy A70 kernel fork"
+arch="aarch64"
+_carch="arm64"
+_flavor="samsung-a70q"
+url="https://kernel.org"
+license="GPL-2.0-only"
+options="!strip !check !tracedeps pmb:cross-native"
+makedepends="
+	bash
+	bc
+	bison
+	clang
+	devicepkg-dev
+	findutils
+	flex
+	linux-headers
+	openssl-dev
+	perl
+"
+
+# Compiles and boots fine, gcc still yet to be tested
+export CC="clang"
+export HOSTCC="clang"
+
+# Source
+_organisation="a70q-lineage"
+_repository="android_kernel_samsung_sm6150"
+_commit="8dd891dbbfd05f1cbe90e46c62ea3f0f6813c369"
+_config="config-$_flavor.$arch"
+source="
+	$pkgname-$_commit.tar.gz::https://github.com/$_organisation/$_repository/archive/$_commit.tar.gz
+	$_config
+	01_disable_techpack_build.patch
+	02_dont_use_prebuilt_dtc.patch
+	03_usb_notifier_qcom_remove_ncm.patch
+	04_revert_kconfig_fix_warnings_on_format.patch
+"
+builddir="$srcdir/$_repository-$_commit"
+_outdir="out"
+
+prepare() {
+	default_prepare
+	REPLACE_GCCH=0 . downstreamkernel_prepare
+}
+
+build() {
+	unset LDFLAGS
+	make O="$_outdir" ARCH="$_carch" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-postmarketOS"
+}
+
+package() {
+	downstreamkernel_package "$builddir" "$pkgdir" "$_carch" \
+		"$_flavor" "$_outdir"
+}
+
+sha512sums="
+5302532a5ee664097b0a2976afba1c4b68a34131d9651cdb6564143fdef2cf6d68fb96c47732709efef9c685bdd8b637b7fa9ea94eefd7730210f7a88d7c67fa  linux-samsung-a70q-8dd891dbbfd05f1cbe90e46c62ea3f0f6813c369.tar.gz
+157150b85e937ba150b46abf90077583033fe3795e9f0f30730216027dbd31f96bd0c3edffd35c6b9ced82056a686222987e7ac2aefa8898e24b834a18943125  config-samsung-a70q.aarch64
+f83914ac6fa868becee7f417bf451680514853770acbfc3d9a5584ec2df55f6ded43fe7ed4a9d568194770dbf017f2d48fdf7ef94f5b1b55e8585f4cd09a251a  01_disable_techpack_build.patch
+4dcade3a5508d7348ce8ee09e060b09b9ecc0d892d99ebf2eaa9576a63e1163e289b7a7ec51de526b03e0b6dcb8d6f43e190610eaa789f62ab27f74e6558fd76  02_dont_use_prebuilt_dtc.patch
+796a8ed9cac9ba6d3ee83b638f67334a1d917fdf3959f603dc75b91f66117ff6cdfce28bbbd58a4b164234729f9b3ec82a5bbbc4c240aeb685a5f4355b25267c  03_usb_notifier_qcom_remove_ncm.patch
+7944c8d8b6bde11da4971dbd8bd01e0a0d5d94fa8616c7defd599e97e685a4efe1a322b98dba2761abcbc9dcddf28ae2f5dacd7612a4b1978d959efe5dba69b9  04_revert_kconfig_fix_warnings_on_format.patch
+"

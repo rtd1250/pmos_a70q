@@ -1,0 +1,24 @@
+diff --git a/drivers/usb/notify/usb_notifier_qcom.c b/drivers/usb/notify/usb_notifier_qcom.c
+index c804a4c82..99467043c 100755
+--- a/drivers/usb/notify/usb_notifier_qcom.c
++++ b/drivers/usb/notify/usb_notifier_qcom.c
+@@ -44,7 +44,7 @@
+ extern int dwc_msm_vbus_event(bool enable);
+ extern void dwc3_max_speed_setting(int speed);
+ 
+-extern void set_ncm_ready(bool ready);
++//extern void set_ncm_ready(bool ready);
+ extern int dwc_msm_id_event(bool enable);
+ extern int gadget_speed(void);
+ 
+@@ -371,8 +371,8 @@ static int otg_accessory_power(bool enable)
+ static int qcom_set_peripheral(bool enable)
+ {
+ 	dwc_msm_vbus_event(enable);
+-	if(!enable)
+-		set_ncm_ready(false);
++	//if(!enable)
++		//set_ncm_ready(false);
+ 	return 0;
+ }
+ 
